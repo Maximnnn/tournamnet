@@ -22,19 +22,7 @@ class PlayGenerator
     public function generateDivisionPlays(array $teamIds): array
     {
         $plays = [];
-
-        $divisions = [
-            'A' => [],
-            'B' => []
-        ];
-
-        foreach ($teamIds as $key => $teamId) {
-            if ($key % 2 === 0) {
-                $divisions['A'][] = $teamId;
-            } else {
-                $divisions['B'][] = $teamId;
-            }
-        }
+        $divisions = $this->separateTeamsToDivisions($teamIds);
 
         foreach ($divisions['A'] as $aTeam) {
             foreach ($divisions['B'] as $bTeam) {
@@ -50,6 +38,24 @@ class PlayGenerator
         return $plays;
     }
 
+    protected function separateTeamsToDivisions($teamIds): array
+    {
+        $divisions = [
+            'A' => [],
+            'B' => []
+        ];
+
+        foreach ($teamIds as $key => $teamId) {
+            if ($key % 2 === 0) {
+                $divisions['A'][] = $teamId;
+            } else {
+                $divisions['B'][] = $teamId;
+            }
+        }
+
+        return $divisions;
+    }
+
     public function generatePlayOffPlays(Tournament $tournament): array
     {
         $this->checkPreviousPlaysFinished($tournament);
@@ -57,14 +63,17 @@ class PlayGenerator
         $teams = $this->playRepository->getTeamsForPlayOff($tournament);
         $plays = [];
 
-        for ($i = 0; $i < count($teams); $i += 2) {
-            $plays[] = new Play([
-                'tournament_id' => $tournament->id,
-                'play_type_id' => PlayType::id('playOff'),
-                'team_left' => $teams[$i],
-                'team_right' => $teams[$i + 1],
-                'step' => $tournament->step + 1
-            ]);
+        if (count($teams) > 1) {
+            for ($i = 0; $i < count($teams); $i += 2) {
+                $plays[] = new Play([
+                    'tournament_id' => $tournament->id,
+                    'play_type_id' => PlayType::id('playOff'),
+                    'team_left' => $teams[$i],
+                    'team_right' => $teams[$i + 1],
+                    'step' => $tournament->step + 1,
+                    'finished' => false
+                ]);
+            }
         }
 
         return $plays;

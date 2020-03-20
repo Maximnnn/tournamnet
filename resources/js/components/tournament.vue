@@ -80,16 +80,18 @@
                 return name;
             },
             updatePlay: function (index) {
-                axios.post('/play/update', this.plays[index]).then((res) => {
-                    this.plays[index].changed = false;
+                this.plays[index].changed = false;
+                axios.post('/play/update', this.plays[index]).catch(() => {
+                    this.plays[index].changed = true;
                 });
             },
             playChanged: function (index) {
                 this.plays[index].changed = true;
             },
             finishPlay: function (index) {
-                axios.post('/play/end/' + this.plays[index].id).then(res => {
-                   this.plays[index].finished = true;
+                this.plays[index].finished = true;
+                axios.post('/play/end/' + this.plays[index].id).catch(() => {
+                    this.plays[index].finished = false;
                 });
             },
             typeLabel: function(id) {

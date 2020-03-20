@@ -2076,8 +2076,9 @@ __webpack_require__.r(__webpack_exports__);
     updatePlay: function updatePlay(index) {
       var _this = this;
 
-      axios.post('/play/update', this.plays[index]).then(function (res) {
-        _this.plays[index].changed = false;
+      this.plays[index].changed = false;
+      axios.post('/play/update', this.plays[index])["catch"](function () {
+        _this.plays[index].changed = true;
       });
     },
     playChanged: function playChanged(index) {
@@ -2086,8 +2087,9 @@ __webpack_require__.r(__webpack_exports__);
     finishPlay: function finishPlay(index) {
       var _this2 = this;
 
-      axios.post('/play/end/' + this.plays[index].id).then(function (res) {
-        _this2.plays[index].finished = true;
+      this.plays[index].finished = true;
+      axios.post('/play/end/' + this.plays[index].id)["catch"](function () {
+        _this2.plays[index].finished = false;
       });
     },
     typeLabel: function typeLabel(id) {
